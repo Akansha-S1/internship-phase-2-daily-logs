@@ -1,100 +1,125 @@
 -- 1. Employees Table
-REATE TABLE employees (
-  employeeNumber INT NOT NULL PRIMARY KEY,
-  lastName VARCHAR(255) NOT NULL,
-  firstName VARCHAR(255) NOT NULL,
-  extension VARCHAR(255),
-  email VARCHAR(255),
-  officeCode CHAR(10) NOT NULL,
-  reportsTo INT,
-  jobTitle VARCHAR(255) NOT NULL,
-  FOREIGN KEY (officeCode) REFERENCES offices(officeCode)
+CREATE TABLE employees (
+  employeeNumber int NOT NULL AUTO_INCREMENT,
+  lastName varchar(50) NOT NULL,
+  firstName varchar(50) NOT NULL,
+  extension varchar(50) DEFAULT NULL,
+  email varchar(100) DEFAULT NULL,
+  officeCode char(10) NOT NULL,
+  reportsTo int DEFAULT NULL,
+  jobTitle varchar(50) NOT NULL,
+  PRIMARY KEY (employeeNumber)
 );
-
 -- 2. Customers Table
 CREATE TABLE customers (
-  customerNumber INT NOT NULL PRIMARY KEY,
-  customerName VARCHAR(255) NOT NULL,
-  contactLastName VARCHAR(255) NOT NULL,
-  contactFirstName VARCHAR(255) NOT NULL,
-  phone VARCHAR(255),
-  addressLine1 VARCHAR(255),
-  addressLine2 VARCHAR(255),
-  city VARCHAR(255) NOT NULL,
-  state VARCHAR(255) NOT NULL,
-  postalCode VARCHAR(255) NOT NULL,
-  country VARCHAR(255) NOT NULL,
-  salesRepEmployeeNumber INT,
-  creditLimit DECIMAL(10,2),
-  FOREIGN KEY (salesRepEmployeeNumber) REFERENCES employees(employeeNumber)
+  customerNumber int NOT NULL AUTO_INCREMENT,
+  customerName varchar(50) NOT NULL,
+  contactLastName varchar(50) NOT NULL,
+  contactFirstName varchar(50) NOT NULL,
+  phone varchar(50) DEFAULT NULL,
+  addressLine1 varchar(50) DEFAULT NULL,
+  addressLine2 varchar(50) DEFAULT NULL,
+  city varchar(50) DEFAULT NULL,
+  state varchar(50) DEFAULT NULL,
+  postalCode varchar(50) DEFAULT NULL,
+  country varchar(50) DEFAULT NULL,
+  salesRepEmployeeNumber int DEFAULT NULL,
+  creditLimit decimal(10,2) DEFAULT NULL,
+  PRIMARY KEY (customerNumber)
 );
 
 -- 3. Orders Table
 CREATE TABLE orders (
-  orderNumber INT NOT NULL PRIMARY KEY,
-  orderDate DATE NOT NULL,
-  requiredDate DATE NOT NULL,
-  shippedDate DATE,
-  status VARCHAR(255) NOT NULL,
-  comments VARCHAR(255),
-  customerNumber INT NOT NULL,
-  FOREIGN KEY (customerNumber) REFERENCES customers(customerNumber)
+  orderNumber int NOT NULL AUTO_INCREMENT,
+  customerNumber int NOT NULL,
+  orderDate date NOT NULL,
+  requiredDate date NOT NULL,
+  shippedDate date DEFAULT NULL,
+  status varchar(15) NOT NULL,
+  comments text DEFAULT NULL,
+  PRIMARY KEY (orderNumber)
 );
 
 -- 4. Offices Table
 CREATE TABLE offices (
-  officeCode CHAR(10) NOT NULL PRIMARY KEY,
-  city VARCHAR(255) NOT NULL,
-  phone VARCHAR(255),
-  addressLine1 VARCHAR(255),
-  addressLine2 VARCHAR(255),
-  state VARCHAR(255) NOT NULL,
-  postalCode VARCHAR(255) NOT NULL,
-  country VARCHAR(255) NOT NULL,
-  territory VARCHAR(255) NOT NULL
+  officeCode char(10) NOT NULL,
+  city varchar(50) NOT NULL,
+  phone varchar(50) NOT NULL,
+  addressLine1 varchar(100) NOT NULL,
+  addressLine2 varchar(100) DEFAULT NULL,
+  state varchar(50) DEFAULT NULL,
+  postalCode varchar(15) DEFAULT NULL,
+  country varchar(50) NOT NULL,
+  PRIMARY KEY (officeCode)
 );
 
 -- 5. Product Lines Table
-CREATE TABLE productLines (
-  productLine VARCHAR(255) NOT NULL PRIMARY KEY,
-  textDescription VARCHAR(255),
-  htmlDescription TEXT
+CREATE TABLE productlines (
+  productLine varchar(50) NOT NULL,
+  textDescription text,
+  htmlDescription text,
+  PRIMARY KEY (productLine)
 );
 
 -- 6. Products Table
 CREATE TABLE products (
-  productCode VARCHAR(255) NOT NULL PRIMARY KEY,
-  productName VARCHAR(255) NOT NULL,
-  productLine VARCHAR(255) NOT NULL,
-  productScale VARCHAR(10),
-  productVendor VARCHAR(255),
-  productDescription TEXT,
-  quantityInStock SMALLINT,
-  buyPrice DECIMAL(10,2),
-  MSRP DECIMAL(10,2),
-  image BLOB,
-  FOREIGN KEY (productLine) REFERENCES productLines(productLine)
+  productCode varchar(50) NOT NULL,
+  productName varchar(50) NOT NULL,
+  productLine varchar(50) NOT NULL,
+  productScale varchar(10) DEFAULT NULL,
+  productVendor varchar(50) DEFAULT NULL,
+  productDescription text,
+  quantityInStock smallint NOT NULL,
+  buyPrice decimal(10,2) NOT NULL,
+  MSRP decimal(10,2) NOT NULL,
+  PRIMARY KEY (productCode)
 );
 
 -- 7. Order Details Table
-CREATE TABLE orderDetails (
-  orderNumber INT NOT NULL,
-  productCode VARCHAR(255) NOT NULL,
-  quantityOrdered SMALLINT NOT NULL,
-  priceEach DECIMAL(10,2) NOT NULL,
-  orderLineNumber SMALLINT NOT NULL,
-  PRIMARY KEY (orderNumber, productCode),
-  FOREIGN KEY (orderNumber) REFERENCES orders(orderNumber),
-  FOREIGN KEY (productCode) REFERENCES products(productCode)
+CREATE TABLE orderdetails (
+  orderNumber int NOT NULL,
+  productCode varchar(50) NOT NULL,
+  quantityOrdered int NOT NULL,
+  priceEach decimal(10,2) NOT NULL,
+  orderLineNumber smallint NOT NULL,
+  PRIMARY KEY (orderNumber, orderLineNumber)
 );
 
 -- 8. Payments Table
 CREATE TABLE payments (
-  customerNumber INT NOT NULL,
-  checkNumber VARCHAR(255) NOT NULL,
-  paymentDate DATE NOT NULL,
-  amount DECIMAL(10,2) NOT NULL,
-  PRIMARY KEY (customerNumber, checkNumber),
-  FOREIGN KEY (customerNumber) REFERENCES customers(customerNumber)
+  customerNumber int NOT NULL,
+  checkNumber varchar(50) NOT NULL,
+  paymentDate date NOT NULL,
+  amount decimal(10,2) NOT NULL,
+  PRIMARY KEY (customerNumber, checkNumber)
 );
->>>>>>> 77e5c328014cee5bc7e7c83a6360fa3eb3e13959
+
+-- Addinng foreign key constraints using ALTER TABLE commands:
+
+ALTER TABLE employees
+ADD CONSTRAINT fk_officeCode
+FOREIGN KEY (officeCode) REFERENCES offices (officeCode);
+
+ALTER TABLE employees
+ADD CONSTRAINT fk_reportsTo
+FOREIGN KEY (reportsTo) REFERENCES employees (employeeNumber);
+
+ALTER TABLE orderdetails
+ADD CONSTRAINT fk_orderNumber
+FOREIGN KEY (orderNumber) REFERENCES orders (orderNumber);
+
+ALTER TABLE orderdetails
+ADD CONSTRAINT fk_productCode
+FOREIGN KEY (productCode) REFERENCES products (productCode);
+
+ALTER TABLE orders
+ADD CONSTRAINT fk_customerNumber
+FOREIGN KEY (customerNumber) REFERENCES customers (customerNumber);
+
+ALTER TABLE payments
+ADD CONSTRAINT fk_customerNumber
+FOREIGN KEY (customerNumber) REFERENCES customers (customerNumber);
+
+ALTER TABLE products
+ADD CONSTRAINT fk_productLine
+FOREIGN KEY (productLine) REFERENCES productlines (productLine);
