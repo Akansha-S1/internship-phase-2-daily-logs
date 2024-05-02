@@ -87,19 +87,6 @@ CREATE TABLE orderDetails (
   FOREIGN KEY (orderNumber) REFERENCES orders(orderNumber),
   FOREIGN KEY (productCode) REFERENCES products(productCode)
 );
-<<<<<<< HEAD
-
--- 8. Payments Table
-CREATE TABLE payments (
-  customerNumber INT NOT NULL,
-  checkNumber VARCHAR(255) NOT NULL,
-  paymentDate DATE NOT NULL,
-  amount DECIMAL(10,2) NOT NULL,
-  PRIMARY KEY (customerNumber, checkNumber),
-  FOREIGN KEY (customerNumber) REFERENCES customers(customerNumber)
-);
-
-=======
 
 -- 8. Payments Table
 CREATE TABLE payments (
