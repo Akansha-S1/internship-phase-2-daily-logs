@@ -1,96 +1,99 @@
-CREATE TABLE productlines(
--> productLine varchar(50) NOT NULL,
--> textDescription varchar(1000) DEFAULT NULL,
--> htmlDescription longtext,
--> image blob,
--> CONSTRAINT PK_productlines PRIMARY KEY (productLine)
--> )ENGINE=InnoDB;
+-- 1. Employees Table
+REATE TABLE employees (
+  employeeNumber INT NOT NULL PRIMARY KEY,
+  lastName VARCHAR(255) NOT NULL,
+  firstName VARCHAR(255) NOT NULL,
+  extension VARCHAR(255),
+  email VARCHAR(255),
+  officeCode CHAR(10) NOT NULL,
+  reportsTo INT,
+  jobTitle VARCHAR(255) NOT NULL,
+  FOREIGN KEY (officeCode) REFERENCES offices(officeCode)
+);
 
-CREATE TABLE products(
--> productCode varchar(10) NOT NULL,
--> productName varchar(20) NOT NULL,
--> productLine varchar(50) NOT NULL,
--> productScale varchar(8) NOT NULL,
--> productVendor varchar(20) NOT NULL,
--> productDescription longtext NOT NULL,
--> quantityInStock smallint(5) NOT NULL,
--> buyPrice decimal(8,2) NOT NULL,
--> MSRP decimal(8,2) NOT NULL,
--> CONSTRAINT PK_products PRIMARY KEY (productCode),
--> CONSTRAINT FK_productlines_products FOREIGN KEY (productLine) REFERENCES productlines (productLine)
--> )ENGINE=InnoDB;
+-- 2. Customers Table
+CREATE TABLE customers (
+  customerNumber INT NOT NULL PRIMARY KEY,
+  customerName VARCHAR(255) NOT NULL,
+  contactLastName VARCHAR(255) NOT NULL,
+  contactFirstName VARCHAR(255) NOT NULL,
+  phone VARCHAR(255),
+  addressLine1 VARCHAR(255),
+  addressLine2 VARCHAR(255),
+  city VARCHAR(255) NOT NULL,
+  state VARCHAR(255) NOT NULL,
+  postalCode VARCHAR(255) NOT NULL,
+  country VARCHAR(255) NOT NULL,
+  salesRepEmployeeNumber INT,
+  creditLimit DECIMAL(10,2),
+  FOREIGN KEY (salesRepEmployeeNumber) REFERENCES employees(employeeNumber)
+);
 
-CREATE TABLE offices(
--> officeCode varchar(5) NOT NULL,
--> city varchar(20) NOT NULL,
--> phone char(10) NOT NULL,
--> addressLine1 varchar(100) NOT NULL,
--> addressLine2 varchar(100) DEFAULT NULL,
--> state varchar(20) NOT NULL,
--> country varchar(50) NOT NULL,
--> postalCode varchar(10) NOT NULL,
--> territory varchar(20) NOT NULL,
--> CONSTRAINT PK_offices PRIMARY KEY (officeCode)
--> )ENGINE=InnoDB;
+-- 3. Orders Table
+CREATE TABLE orders (
+  orderNumber INT NOT NULL PRIMARY KEY,
+  orderDate DATE NOT NULL,
+  requiredDate DATE NOT NULL,
+  shippedDate DATE,
+  status VARCHAR(255) NOT NULL,
+  comments VARCHAR(255),
+  customerNumber INT NOT NULL,
+  FOREIGN KEY (customerNumber) REFERENCES customers(customerNumber)
+);
 
-CREATE TABLE employees(
--> employeeNumber int(10) NOT NULL,
--> lastName varchar(30) DEFAULT NULL,
--> firstName varchar(30) NOT NULL,
--> extension varchar(15) NOT NULL,
--> email varchar(100) NOT NULL,
--> officeCode varchar(5) NOT NULL,
--> reportsTo int(10) DEFAULT NULL,
--> jobTitle varchar(20) NOT NULL,
--> CONSTRAINT PK_employees PRIMARY KEY (employeeNumber),
--> CONSTRAINT FK_employees_employees FOREIGN KEY (reportsTo) REFERENCES employees (employeeNumber),
--> CONSTRAINT FK_offices_employees FOREIGN KEY (officeCode) REFERENCES offices (officeCode)
--> )ENGINE=InnoDB;
+-- 4. Offices Table
+CREATE TABLE offices (
+  officeCode CHAR(10) NOT NULL PRIMARY KEY,
+  city VARCHAR(255) NOT NULL,
+  phone VARCHAR(255),
+  addressLine1 VARCHAR(255),
+  addressLine2 VARCHAR(255),
+  state VARCHAR(255) NOT NULL,
+  postalCode VARCHAR(255) NOT NULL,
+  country VARCHAR(255) NOT NULL,
+  territory VARCHAR(255) NOT NULL
+);
 
-CREATE TABLE customers(
--> customerNumber int(11) NOT NULL,
--> customerName varchar(50) NOT NULL,
--> contactLastName varchar(50) NOT NULL,
--> contactFirstName varchar(50) NOT NULL,
--> phone char(10) NOT NULL,
--> addressLine1 varchar(100) NOT NULL,
--> addressLine2 varchar(100) DEFAULT NULL,
--> city varchar(20) NOT NULL,
--> state varchar(20) NOT NULL,
--> postalCode varchar(10) NOT NULL,
--> country varchar(50) NOT NULL,
--> salesRepEmployeeNumber int(10) DEFAULT NULL,
--> CONSTRAINT PK_customers PRIMARY KEY (customerNumber),
--> CONSTRAINT FK_employees_customers FOREIGN KEY (salesRepEmployeeNumber) REFERENCES employees (employeeNumber)
--> )ENGINE=InnoDB;
+-- 5. Product Lines Table
+CREATE TABLE productLines (
+  productLine VARCHAR(255) NOT NULL PRIMARY KEY,
+  textDescription VARCHAR(255),
+  htmlDescription TEXT
+);
 
-CREATE TABLE payments(
--> customerNumber int(11) NOT NULL,
--> checkNumber varchar(20) NOT NULL,
--> paymentDate date NOT NULL,
--> amount decimal(8,2) NOT NULL,
--> CONSTRAINT PK_payments PRIMARY KEY (customerNumber,checkNumber),
--> CONSTRAINT FK_customers_payments FOREIGN KEY (customerNumber) REFERENCES customers (customerNumber)
--> )ENGINE=InnoDB;
+-- 6. Products Table
+CREATE TABLE products (
+  productCode VARCHAR(255) NOT NULL PRIMARY KEY,
+  productName VARCHAR(255) NOT NULL,
+  productLine VARCHAR(255) NOT NULL,
+  productScale VARCHAR(10),
+  productVendor VARCHAR(255),
+  productDescription TEXT,
+  quantityInStock SMALLINT,
+  buyPrice DECIMAL(10,2),
+  MSRP DECIMAL(10,2),
+  image BLOB,
+  FOREIGN KEY (productLine) REFERENCES productLines(productLine)
+);
 
-CREATE TABLE orders(
--> orderNumber int(11) NOT NULL UNIQUE,
--> orderDate date NOT NULL,
--> requiredDate date NOT NULL,
--> shippedDate date DEFAULT NULL,
--> status varchar(10) NOT NULL,
--> comments mediumtext,
--> customerNumber int(11) NOT NULL,
--> CONSTRAINT PK_orders PRIMARY KEY (orderNumber),
--> CONSTRAINT FK_customers_orders FOREIGN KEY (customerNumber) REFERENCES customers (customerNumber)
--> )ENGINE=InnoDB;
+-- 7. Order Details Table
+CREATE TABLE orderDetails (
+  orderNumber INT NOT NULL,
+  productCode VARCHAR(255) NOT NULL,
+  quantityOrdered SMALLINT NOT NULL,
+  priceEach DECIMAL(10,2) NOT NULL,
+  orderLineNumber SMALLINT NOT NULL,
+  PRIMARY KEY (orderNumber, productCode),
+  FOREIGN KEY (orderNumber) REFERENCES orders(orderNumber),
+  FOREIGN KEY (productCode) REFERENCES products(productCode)
+);
 
-CREATE TABLE orderdetails(
--> orderNumber int(11) NOT NULL,
--> productCode varchar(10) NOT NULL,
--> quantityOrdered int(11) NOT NULL,
--> priceEach decimal(10,2) NOT NULL,
--> orderLineNumber mediumint(6) NOT NULL,
--> CONSTRAINT PK_orderdetails PRIMARY KEY (orderNumber,productCode),
--> CONSTRAINT FK_products_orderdetails FOREIGN KEY (productCode) REFERENCES products (productCode)
--> )ENGINE=InnoDB;
+-- 8. Payments Table
+CREATE TABLE payments (
+  customerNumber INT NOT NULL,
+  checkNumber VARCHAR(255) NOT NULL,
+  paymentDate DATE NOT NULL,
+  amount DECIMAL(10,2) NOT NULL,
+  PRIMARY KEY (customerNumber, checkNumber),
+  FOREIGN KEY (customerNumber) REFERENCES customers(customerNumber)
+);
