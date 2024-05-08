@@ -1,32 +1,23 @@
 -- Part 1: Understanding GROUP BY and Aggregate Functions
 
 -- 1.1 Task: Generate a report showing the total sales per product line. Include the product line, the total number of products sold, and the total sales amount.
-select 
-    productline,
-    count(productcode) as total_products_sold,
-    sum(quantityordered * priceeach) as total_sales_amount
-from 
-    products
-group by 
-    productline;
+SELECT p.productLine,
+       SUM(od.quantityOrdered) AS total_products_sold,
+       SUM(od.quantityOrdered * od.priceEach) AS total_sales_amount
+FROM orderdetails od
+JOIN products p ON od.productCode = p.productCode
+GROUP BY p.productLine;
 
 -- 1.2 Task: Determine the total sales for each office, including office city, number of orders processed, and total sales amount.
-select 
-    o.city as office_city,
-    count(distinct o.ordernumber) as number_of_orders,
-    sum(od.quantityordered * od.priceeach) as total_sales_amount
-from 
-    offices o
-join 
-    employees e on o.officecode = e.officecode
-join 
-    customers c on e.employeenumber = c.salesrepemployeenumber
-join 
-    orders o on c.customernumber = o.customernumber
-join 
-    orderdetails od on o.ordernumber = od.ordernumber
-group by 
-    o.officecode;
+SELECT o.city AS office_city,
+       COUNT(o.officeCode) AS num_orders_processed,
+       SUM(od.quantityOrdered * od.priceEach) AS total_sales_amount
+FROM offices o
+JOIN employees e ON o.officeCode = e.officeCode
+JOIN customers c ON e.employeeNumber = c.salesRepEmployeeNumber
+JOIN orders ord ON c.customerNumber = ord.customerNumber
+JOIN orderdetails od ON ord.orderNumber = od.orderNumber
+GROUP BY o.city;
 
 -- Part 2: Filtering with HAVING Clause
 
@@ -48,18 +39,19 @@ join
 group by 
     o.officecode
 having 
-    avg(od.quantityordered * od.priceeach) > 5000; -- Specify your threshold value here
+    avg(od.quantityordered * od.priceeach) > 5000; 
 
 -- 2.2 Task: Filter product lines that have an average product sale price above a specific value.
-select 
-    productline,
-    avg(priceeach) as average_product_price
-from 
-    products
-group by 
-    productline
-having 
-    avg(priceeach) > 100; -- Specify your threshold value here
+SELECT 
+    productLine AS productline,
+    AVG(buyPrice) AS average_product_price
+FROM 
+    Products
+GROUP BY 
+    productLine
+HAVING 
+    AVG(buyPrice) > 100;
+
 
 -- Part 3: Complex Aggregations and Grouping
 
@@ -73,7 +65,7 @@ from
 group by 
     continent
 having 
-    avg(population) > 50000000; -- Specify your threshold value here
+    avg(population) > 50000000; 
 
 -- 3.2 Task: Identify countries with more than a specific number of official languages and display the country name, number of official languages, and total population.
 select 
