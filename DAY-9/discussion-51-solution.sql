@@ -9,6 +9,7 @@ select order_id, SUM(order_amount) as total_amount from orders group by order_id
 
 --Task 2.2 Payments within a Date Range
 select * from payments where payment_date between '2024-01-01' and '2024-12-31';
+.
 
 --Task 3.1 Orders Exceeding Average Sale Amount
 select order_id, SUM(order_amount) as total_amount from orders group by order_id having SUM(order_amount) > (select avg(order_amount) from orders);
