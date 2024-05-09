@@ -1,5 +1,5 @@
 --Task 1.1 Wildcard Searches for Product Names
-select product_name from products where product_name like 'Classic%Car';
+SELECT productName FROM Product WHERE productName LIKE 'Classic%Car';
 
 --Task 1.2 Flexible Search for Customer Addresses
 select customer_address from customers where customer_address like '%Street%' or customer_address like '%Avenue%';
